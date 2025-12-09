@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для Любимой Мамы</title>
+    <!-- Подключаем величественные шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Pinyon+Script&family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F7E7CE;
+            --gold-dark: #AA6C39;
+            --bg-color: #fcfcfc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
+            color: #333;
+            font-family: 'Cinzel', serif;
+            overflow-x: hidden;
+        }
+
+        /* Анимация золотой пыли на фоне */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Главный экран */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 5rem;
+            margin-bottom: 20px;
+            /* Эффект золотого текста */
+            background: linear-gradient(45deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold));
+            background-size: 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s infinite linear;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3));
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #666;
+            opacity: 0;
+            animation: fadeInUp 2s ease forwards 1s;
+        }
+
+        /* Секция со словами */
+        .content {
+            position: relative;
+            z-index: 2;
+            padding: 100px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            margin-bottom: 100px;
+            padding: 60px 40px;
+            text-align: center;
+            border-radius: 4px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            opacity: 0; /* Скрыто по умолчанию для JS анимации */
+            transform: translateY(50px);
+            transition: all 1s ease;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 1px solid var(--gold);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card h2 {
+            font-size: 2.5rem;
+            color: var(--gold-dark);
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        /* Декоративные элементы */
+        .ornament {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-top: 20px;
+        }
+
+        /* Анимации */
+        @keyframes shine {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Адаптив для телефонов */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .card h2 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Канвас для золотой пыли -->
+    <canvas id="particles"></canvas>
+
+    <section class="hero">
+        <h1>Мама</h1>
+        <p>Ты — сердце этого мира</p>
+    </section>
+
+    <section class="content">
+        <!-- Карточка 1 -->
+        <div class="card">
+            <h2>Величие души</h2>
+            <p>Твоя любовь подобна солнечному свету — она согревает, даже когда мы далеко. Ты создаешь уют из ничего и даришь покой одним лишь взглядом.</p>
+            <div class="ornament">❦</div>
+        </div>
+
+        <!-- Карточка 2 -->
+        <div class="card">
+            <h2>Бесконечная мудрость</h2>
+            <p>Ты лучшая не потому, что идеальна, а потому, что твоя доброта не знает границ. Спасибо за то, что ты есть.</p>
+            <div class="ornament">❦</div>
+        </div>
+
+        <!-- Карточка 3 -->
+        <div class="card">
+            <h2>Ангел-хранитель</h2>
+            <p>Пусть каждый твой день будет наполнен светом, который ты даришь нам. Ты достойна всего золота мира.</p>
+            <div class="ornament">❦</div>
+        </div>
+    </section>
+
+    <script>
+        // 1. Анимация появления карточек при скролле
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // 2. Генерация золотой пыли (Particles)
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        const numberOfParticles = 100;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1; // Размер частицы
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = 'rgba(212, 175, 55, ' + (Math.random() * 0.5 + 0.1) + ')'; // Золотой с прозрачностью
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                // Если улетели за экран, возвращаем
+                if (this.size > 0.2) this.size -= 0.01; // Мерцание
+                if (this.size <= 0.2) this.size = Math.random() * 3 + 1;
+                
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Добавляем сияние
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = "#D4AF37";
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+    </script>
+</body>
+</html>
