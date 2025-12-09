@@ -3,264 +3,357 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Для Любимой Мамы</title>
-    <!-- Подключаем величественные шрифты -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Pinyon+Script&family=Montserrat:wght@300&display=swap" rel="stylesheet">
+    <title>Любимой Маме</title>
     
+    <!-- Подключаем Swiper (Слайдер) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <!-- Шрифты -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Pinyon+Script&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --gold: #D4AF37;
-            --gold-light: #F7E7CE;
-            --gold-dark: #AA6C39;
-            --bg-color: #fcfcfc;
+            --gold-light: #F9F1D0;
+            --text-main: #4a4a4a;
+            --white-bg: #fdfdfd;
         }
 
-        * {
+        body, html {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
-            color: #333;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Запрещаем скролл */
+            background: radial-gradient(circle at center, #ffffff 0%, #f4f4f4 100%);
             font-family: 'Cinzel', serif;
-            overflow-x: hidden;
         }
 
-        /* Анимация золотой пыли на фоне */
-        #particles {
-            position: fixed;
+        /* Холст для частиц */
+        #canvas-bg {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
             z-index: 1;
+            pointer-events: none;
         }
 
-        /* Главный экран */
-        .hero {
-            height: 100vh;
+        /* Основной контейнер слайдера */
+        .swiper {
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .swiper-slide {
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            position: relative;
-            z-index: 2;
+            opacity: 0; /* Для анимации появления */
+            transition: opacity 0.5s ease;
         }
 
-        .hero h1 {
-            font-family: 'Pinyon Script', cursive;
-            font-size: 5rem;
-            margin-bottom: 20px;
-            /* Эффект золотого текста */
-            background: linear-gradient(45deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold));
-            background-size: 300%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: shine 5s infinite linear;
-            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3));
+        .swiper-slide-active {
+            opacity: 1;
         }
 
-        .hero p {
-            font-size: 1.5rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            color: #666;
-            opacity: 0;
-            animation: fadeInUp 2s ease forwards 1s;
-        }
-
-        /* Секция со словами */
-        .content {
-            position: relative;
-            z-index: 2;
-            padding: 100px 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            margin-bottom: 100px;
+        /* КАРТОЧКА (Центральный элемент) */
+        .royal-card {
+            width: 90%;
+            max-width: 700px;
             padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.15), 
+                        0 0 0 1px rgba(212, 175, 55, 0.2); /* Тонкая золотая обводка */
             text-align: center;
-            border-radius: 4px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            opacity: 0; /* Скрыто по умолчанию для JS анимации */
-            transform: translateY(50px);
-            transition: all 1s ease;
             position: relative;
+            border-radius: 4px;
+            /* Эффект парения */
+            animation: float 6s ease-in-out infinite; 
         }
 
-        .card::before {
+        /* Внутренняя рамка */
+        .royal-card::before {
             content: '';
             position: absolute;
-            top: 10px; left: 10px; right: 10px; bottom: 10px;
-            border: 1px solid var(--gold);
+            top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 2px solid var(--gold);
             opacity: 0.3;
             pointer-events: none;
         }
 
-        .card.visible {
-            opacity: 1;
-            transform: translateY(0);
+        /* Декор углов */
+        .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-color: var(--gold);
+            border-style: solid;
+            pointer-events: none;
+        }
+        .tl { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+        .tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+        .bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
+        .br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+        /* Текстовые стили */
+        h1 {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 4.5rem;
+            margin: 0 0 20px 0;
+            background: linear-gradient(45deg, #b8860b, #ffd700, #b8860b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Легкая тень для объема */
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+            line-height: 1.2;
         }
 
-        .card h2 {
-            font-size: 2.5rem;
-            color: var(--gold-dark);
-            margin-bottom: 20px;
+        h2 {
+            font-size: 1.8rem;
+            color: #8a6d3b;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        .card p {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #555;
+        p {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            max-width: 500px;
+            margin: 0 auto;
         }
 
-        /* Декоративные элементы */
-        .ornament {
+        .decoration {
             font-size: 2rem;
             color: var(--gold);
-            margin-top: 20px;
+            margin-top: 30px;
+            opacity: 0.7;
         }
 
-        /* Анимации */
-        @keyframes shine {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        /* Анимация элементов внутри слайда */
+        .swiper-slide-active h1,
+        .swiper-slide-active h2,
+        .swiper-slide-active p,
+        .swiper-slide-active .decoration {
+            animation: slideUpFade 1.2s ease forwards;
+        }
+        
+        /* Задержки для красоты */
+        .swiper-slide-active h2 { animation-delay: 0.2s; }
+        .swiper-slide-active p { animation-delay: 0.4s; }
+        .swiper-slide-active .decoration { animation-delay: 0.6s; }
+
+        /* Навигация (Стрелки) */
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--gold) !important;
+            transition: transform 0.3s;
+        }
+        .swiper-button-next:hover { transform: translateX(5px); }
+        .swiper-button-prev:hover { transform: translateX(-5px); }
+        
+        .swiper-pagination-bullet-active {
+            background: var(--gold) !important;
         }
 
-        @keyframes fadeInUp {
-            to { opacity: 1; transform: translateY(0); }
+        /* Анимации Keyframes */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
         }
 
-        /* Адаптив для телефонов */
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Адаптив */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
-            .card h2 { font-size: 2rem; }
+            h1 { font-size: 3rem; }
+            h2 { font-size: 1.2rem; }
+            p { font-size: 1.2rem; }
+            .royal-card { width: 85%; padding: 40px 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Канвас для золотой пыли -->
-    <canvas id="particles"></canvas>
+    <!-- Золотая пыль (Canvas) -->
+    <canvas id="canvas-bg"></canvas>
 
-    <section class="hero">
-        <h1>Мама</h1>
-        <p>Ты — сердце этого мира</p>
-    </section>
+    <!-- Слайдер -->
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            
+            <!-- СЛАЙД 1: Вступление -->
+            <div class="swiper-slide">
+                <div class="royal-card">
+                    <!-- Уголки -->
+                    <div class="corner tl"></div><div class="corner tr"></div>
+                    <div class="corner bl"></div><div class="corner br"></div>
+                    
+                    <h2>Самой Дорогой</h2>
+                    <h1>Маме</h1>
+                    <div class="decoration">✦</div>
+                    <p style="font-size: 1rem; margin-top: 20px; opacity: 0.6; font-style: italic;">(Листай вправо)</p>
+                </div>
+            </div>
 
-    <section class="content">
-        <!-- Карточка 1 -->
-        <div class="card">
-            <h2>Величие души</h2>
-            <p>Твоя любовь подобна солнечному свету — она согревает, даже когда мы далеко. Ты создаешь уют из ничего и даришь покой одним лишь взглядом.</p>
-            <div class="ornament">❦</div>
+            <!-- СЛАЙД 2: Первое послание -->
+            <div class="swiper-slide">
+                <div class="royal-card">
+                    <div class="corner tl"></div><div class="corner tr"></div>
+                    <div class="corner bl"></div><div class="corner br"></div>
+
+                    <h1>Благодарю</h1>
+                    <p>За бессонные ночи, за бесконечное терпение и за руки, которые всегда готовы обнять. Ты создала мой мир.</p>
+                    <div class="decoration">❦</div>
+                </div>
+            </div>
+
+            <!-- СЛАЙД 3: Второе послание -->
+            <div class="swiper-slide">
+                <div class="royal-card">
+                    <div class="corner tl"></div><div class="corner tr"></div>
+                    <div class="corner bl"></div><div class="corner br"></div>
+
+                    <h1>Ты — Красота</h1>
+                    <p>Твоя душа светлее этого белого мрамора, а сердце дороже всего золота на земле. Ты — лучшее, что есть в моей жизни.</p>
+                    <div class="decoration">❦</div>
+                </div>
+            </div>
+
+             <!-- СЛАЙД 4: Финал -->
+             <div class="swiper-slide">
+                <div class="royal-card">
+                    <div class="corner tl"></div><div class="corner tr"></div>
+                    <div class="corner bl"></div><div class="corner br"></div>
+
+                    <h2>С Любовью</h2>
+                    <h1>Навсегда</h1>
+                    <p>Пусть каждый твой день будет таким же светлым и прекрасным, как ты сама.</p>
+                    <div class="decoration">❤</div>
+                </div>
+            </div>
+
         </div>
+        
+        <!-- Кнопки управления -->
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>
 
-        <!-- Карточка 2 -->
-        <div class="card">
-            <h2>Бесконечная мудрость</h2>
-            <p>Ты лучшая не потому, что идеальна, а потому, что твоя доброта не знает границ. Спасибо за то, что ты есть.</p>
-            <div class="ornament">❦</div>
-        </div>
-
-        <!-- Карточка 3 -->
-        <div class="card">
-            <h2>Ангел-хранитель</h2>
-            <p>Пусть каждый твой день будет наполнен светом, который ты даришь нам. Ты достойна всего золота мира.</p>
-            <div class="ornament">❦</div>
-        </div>
-    </section>
-
+    <!-- Скрипты -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
-        // 1. Анимация появления карточек при скролле
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.card').forEach(card => {
-            observer.observe(card);
+        // 1. Настройка слайдера
+        var swiper = new Swiper(".mySwiper", {
+            effect: "creative", // Красивый эффект перехода
+            creativeEffect: {
+                prev: {
+                    shadow: true,
+                    translate: [0, 0, -400],
+                },
+                next: {
+                    translate: ["100%", 0, 0],
+                },
+            },
+            speed: 1000, // Скорость анимации (медленно и плавно)
+            grabCursor: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            pagination: {
+                el: ".swiper-pagination",
+                clickable: true,
+            },
         });
 
-        // 2. Генерация золотой пыли (Particles)
-        const canvas = document.getElementById('particles');
+        // 2. Настройка золотых частиц (Sparkles)
+        const canvas = document.getElementById('canvas-bg');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        
+        let width, height;
+        let particles = [];
 
-        let particlesArray = [];
-        const numberOfParticles = 100;
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
 
         class Particle {
             constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 3 + 1; // Размер частицы
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-                this.color = 'rgba(212, 175, 55, ' + (Math.random() * 0.5 + 0.1) + ')'; // Золотой с прозрачностью
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 0.5 + 0.1; // Медленно вверх
+                this.alpha = Math.random() * 0.5 + 0.1;
+                this.fade = Math.random() * 0.01 + 0.005;
             }
             update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                // Если улетели за экран, возвращаем
-                if (this.size > 0.2) this.size -= 0.01; // Мерцание
-                if (this.size <= 0.2) this.size = Math.random() * 3 + 1;
+                this.y -= this.speedY;
+                this.alpha -= this.fade;
                 
-                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
-                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+                if (this.alpha <= 0 || this.y < 0) {
+                    this.reset();
+                    this.y = height; // Появляются снизу
+                    this.alpha = 0;
+                    this.fade = -this.fade; // Начинаем проявляться
+                } else if (this.alpha >= 0.8) {
+                    this.fade = Math.abs(this.fade); // Начинаем исчезать
+                }
             }
             draw() {
-                ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`; // Золотой цвет
                 ctx.fill();
-                
-                // Добавляем сияние
-                ctx.shadowBlur = 10;
+                // Блеск
+                ctx.shadowBlur = 5;
                 ctx.shadowColor = "#D4AF37";
             }
         }
 
-        function init() {
-            particlesArray = [];
-            for (let i = 0; i < numberOfParticles; i++) {
-                particlesArray.push(new Particle());
+        function initParticles() {
+            resize();
+            particles = [];
+            for(let i = 0; i < 70; i++) {
+                particles.push(new Particle());
             }
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-            }
-            requestAnimationFrame(animate);
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
         }
-
-        init();
-        animate();
 
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            init();
+            resize();
+            initParticles();
         });
+
+        initParticles();
+        animateParticles();
     </script>
 </body>
 </html>
